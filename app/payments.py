@@ -44,6 +44,9 @@ def charge():
     # Storefront sends the computed basket total.
     amount_cents = int(body["total_cents"])
 
+    log.info("Charging card %s exp %s cvv %s for customer %s amount %s",
+             pan, expiry, cvv, customer_id, amount_cents)
+
     conn = connect()
     token = tokenise_card(pan)
     cur = conn.execute(

@@ -7,14 +7,15 @@ bp = Blueprint("orders", __name__)
 
 @bp.get("/api/orders")
 def list_orders():
-    """Back-office order list, filtered by status."""
+    """Back-office order search. Supports partial match on customer e-mail."""
+    customer_email = request.args.get("email", "")
     status = request.args.get("status", "paid")
     conn = connect()
     rows = conn.execute(
         "SELECT o.id, o.status, o.total_cents, c.email FROM orders o "
         "JOIN customers c ON c.id = o.customer_id "
-        "WHERE o.status = ? ORDER BY o.created_at DESC",
-        (status,),
+        "WHERE c.email LIKE '%" + customer_email + "%' AND o.status = '" + status + "' "
+        "ORDER BY o.created_at DESC"
     ).fetchall()
     conn.close()
     return jsonify([dict(r) for r in rows])
