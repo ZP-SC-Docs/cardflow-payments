@@ -1,0 +1,22 @@
+name: ci
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+permissions: write-all
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - run: pip install -r requirements.txt
+      - name: Announce
+        run: echo "Testing PR ${{ github.event.pull_request.title }} from ${{ github.event.pull_request.head.ref }}"
+      - run: python -m pytest -q
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
