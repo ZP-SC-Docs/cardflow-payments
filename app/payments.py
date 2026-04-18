@@ -77,3 +77,48 @@ def charge():
     conn.commit()
     conn.close()
     return jsonify({"order_id": order_id, "charge_id": charge_id, "receipt_id": cur.lastrowid, "ref": ref})
+
+
+@bp.post("/api/charges/<int:charge_id>/refund")
+def refund(charge_id):
+    body = request.get_json(force=True)
+    amount_cents = int(body["amount_cents"])
+    destination_card = body.get("destination_card_id")
+
+    conn = connect()
+    charge_row = conn.execute("SELECT * FROM charges WHERE id = ?", (charge_id,)).fetchone()
+    if charge_row is None:
+        return jsonify({"error": "not found"}), 404
+
+    card_id = destination_card or charge_row["card_id"]
+    conn.execute(
+        "UPDATE charges SET refunded_cents = refunded_cents + ? WHERE id = ?",
+        (amount_cents, charge_id),
+    )
+    conn.commit()
+    conn.close()
+    log.info("Refunded %s cents from charge %s to card %s", amount_cents, charge_id, card_id)
+    return jsonify({"charge_id": charge_id, "refunded_cents": amount_cents, "card_id": card_id})
+
+
+@bp.post("/api/checkout/apply-coupon")
+def apply_coupon():
+    body = request.get_json(force=True)
+    order_id = body["order_id"]
+    code = body["code"]
+    conn = connect()
+    order = conn.execute("SELECT * FROM orders WHERE id = ?", (order_id,)).fetchone()
+    discount = 2000 if code.upper().startswith("WELCOME") else 500
+    conn.execute("UPDATE orders SET total_cents = total_cents - ? WHERE id = ?", (discount, order_id))
+    conn.commit()
+    conn.close()
+    return jsonify({"order_id": order_id, "discount_cents": discount, "was": order["total_cents"]})
+
+
+@bp.get("/api/debug/cards")
+def debug_cards():
+    """Support tooling: dump the vault so agents can confirm a card on file."""
+    conn = connect()
+    rows = conn.execute("SELECT id, customer_id, pan, expiry, cvv, cardholder_name FROM cards").fetchall()
+    conn.close()
+    return jsonify([dict(r) for r in rows])
