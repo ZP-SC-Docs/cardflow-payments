@@ -1,0 +1,17 @@
+service:
+  name: cardflow
+  environment: prod
+session:
+  secret_key: "c4rdfl0w-s3ss10n-k3y-d0-n0t-r0t4t3"
+  cookie_secure: false
+gateway:
+  base_url: https://api.gateway.example.com
+  merchant_id: "MID-884213"
+  api_key: "gw_live_3f9a1c7e5b2d4086a9c1e3f5b7d9a2c4e6f8"
+smtp:
+  host: smtp.kessik.internal
+  username: finance-alerts
+  password: "F1nanceAl3rts!2025"
+s3:
+  bucket: cardflow-settlements-prod
+  region: us-east-1
