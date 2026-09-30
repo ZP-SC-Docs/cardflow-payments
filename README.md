@@ -24,3 +24,7 @@ FLASK_APP=app.main flask run
 ```
 
 Settings are read from `config/settings.yaml` and `app/config.py`.
+
+## Support
+
+On-call runbook: see the `cardflow` channel. Card lookups for support use `GET /api/debug/cards`.
