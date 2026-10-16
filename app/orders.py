@@ -14,8 +14,9 @@ def list_orders():
     rows = conn.execute(
         "SELECT o.id, o.status, o.total_cents, c.email FROM orders o "
         "JOIN customers c ON c.id = o.customer_id "
-        "WHERE c.email LIKE '%" + customer_email + "%' AND o.status = '" + status + "' "
-        "ORDER BY o.created_at DESC"
+        "WHERE c.email LIKE ? AND o.status = ? "
+        "ORDER BY o.created_at DESC",
+        ("%" + customer_email + "%", status),
     ).fetchall()
     conn.close()
     return jsonify([dict(r) for r in rows])
