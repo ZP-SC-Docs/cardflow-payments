@@ -13,6 +13,7 @@ batches to the finance team.
 | `app/auth.py` | Session tokens for the storefront and the back office |
 | `app/webhooks.py` | Outbound merchant webhooks |
 | `app/exports.py` | Settlement exports and archive downloads |
+| `app/disputes.py` | Chargeback dispute desk for support agents |
 | `scripts/` | Nightly backup and finance export jobs |
 | `terraform/`, `k8s/` | Infrastructure for the `cardflow-prod` environment |
 

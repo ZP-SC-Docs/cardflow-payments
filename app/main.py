@@ -1,7 +1,7 @@
 import yaml
 from flask import Flask, jsonify
 
-from app import auth, exports, orders, payments, webhooks
+from app import auth, disputes, exports, orders, payments, webhooks
 from app.db import init_db
 from app.logging_config import configure
 
@@ -17,7 +17,7 @@ def create_app():
     app.config["SECRET_KEY"] = app.config["SETTINGS"]["session"]["secret_key"]
     configure(app)
     init_db()
-    for bp in (auth.bp, orders.bp, payments.bp, webhooks.bp, exports.bp):
+    for bp in (auth.bp, orders.bp, payments.bp, webhooks.bp, exports.bp, disputes.bp):
         app.register_blueprint(bp)
 
     @app.errorhandler(Exception)
